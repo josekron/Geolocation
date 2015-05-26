@@ -6,8 +6,7 @@ For this example, this project provides a CRUD of geolocation with a location co
 #Technologies
 I use Maven to add the dependencies in the pom.xml file.
 
-- Morphia: this component included in org.mongodb provides a DAO layer that is responsible of mapping the Object to MongoDB and viceversa.
-When the project are too big, is necessary Morphia because it abstracts you from the BD.
+- Morphia: this component included in org.mongodb provides a DAO layer that is responsible of mapping the Object to MongoDB and viceversa. When projects with MongoDB are too big, is necessary Morphia because it abstracts you from the BD.
 
 - Log4j: the project is integrated a system log with Log4j.
 
