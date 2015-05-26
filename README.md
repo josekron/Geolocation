@@ -1,7 +1,7 @@
 # Geolocation
 J2EE Application that provides RESTful WS and using MongoDB with Morphia.
 
-For this example, this project provides a CRUD of geolocation, with a location coordinates and save or read this information from MongoDB database.
+For this example, this project provides a CRUD of geolocation with a location coordinates, and save or read this information from MongoDB database.
 
 #Technologies
 I use Maven to add the dependencies in the pom.xml file.
