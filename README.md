@@ -14,5 +14,5 @@ I use Maven to add the dependencies in the pom.xml file.
 
 - Don´t forget that MongoDB required only one instance, so you must initialize it in the Listener.
 
-- In our GeoProfileVo object the Id is String type but MongoDB keeps a ObjectId, so we must instantiate an ObjectId(id) for seach for seach a specific object.
+- In our GeoProfileVo object the Id is String type but MongoDB keeps a ObjectId, so we must instantiate an ObjectId(id) for seach a specific object.
 
