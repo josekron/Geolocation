@@ -1,5 +1,5 @@
 # Geolocation
-J2EE Application that provides RESTful WS and using MongoDB with Morphia.
+Java EE Application that provides RESTful WS and using MongoDB with Morphia.
 
 For this example, this project provides a CRUD of geolocation with a location coordinates, and save or read this information from a MongoDB database.
 
