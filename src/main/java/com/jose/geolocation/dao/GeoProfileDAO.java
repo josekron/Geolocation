@@ -2,6 +2,15 @@ package main.java.com.jose.geolocation.dao;
 
 import java.util.List;
 
+import org.bson.types.ObjectId;
+import org.mongodb.morphia.Morphia;
+import org.mongodb.morphia.dao.BasicDAO;
+import org.mongodb.morphia.query.Query;
+import org.mongodb.morphia.query.UpdateOperations;
+import org.mongodb.morphia.query.UpdateResults;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import com.mongodb.MongoClient;
 import com.mongodb.WriteResult;
 
@@ -9,21 +18,13 @@ import main.java.com.jose.geolocation.exception.GeoProfileNotFoundException;
 import main.java.com.jose.geolocation.exception.GeoProfileServiceException;
 import main.java.com.jose.geolocation.vo.GeoProfileVo;
 
-import org.apache.log4j.Logger;
-import org.bson.types.ObjectId;
-import org.mongodb.morphia.Morphia;
-import org.mongodb.morphia.dao.BasicDAO;
-import org.mongodb.morphia.query.Query;
-import org.mongodb.morphia.query.UpdateOperations;
-import org.mongodb.morphia.query.UpdateResults;
-
 /**
  * The Class GeoProfileDAO.
  */
 public class GeoProfileDAO extends BasicDAO<GeoProfileVo, ObjectId>{
 	
 	/** The Constant log. */
-	private static final Logger LOGGER = Logger.getLogger(GeoProfileDAO.class.getName());
+	private static final Logger LOGGER = LoggerFactory.getLogger(GeoProfileDAO.class.getName());
 
 	/**
 	 * Instantiates a new geo profile dao.
@@ -83,8 +84,8 @@ public class GeoProfileDAO extends BasicDAO<GeoProfileVo, ObjectId>{
 	 *
 	 * @param listGeoProfileVo the list geo profile vo
 	 */
-	public void saveListGeoProfile(List<GeoProfileVo> listGeoProfileVo){
-		LOGGER.info("[GeoProfileDAO - saveGeoProfile] - init");
+	public void saveGeoProfiles(List<GeoProfileVo> listGeoProfileVo){
+		LOGGER.info("[GeoProfileDAO - saveGeoProfiles] - init");
 		getDs().save(listGeoProfileVo);
 	}
 	

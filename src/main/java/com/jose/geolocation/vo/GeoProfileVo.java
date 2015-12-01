@@ -17,7 +17,7 @@ import org.mongodb.morphia.annotations.Id;
 @Entity
 @XmlRootElement
 @XmlAccessorType(XmlAccessType.FIELD)
-public class GeoProfileVo extends ResponseVo implements Serializable{
+public class GeoProfileVo implements Serializable{
 
 	/** The Constant serialVersionUID. */
 	private static final long serialVersionUID = -4975628041316056892L;

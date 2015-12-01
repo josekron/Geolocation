@@ -4,8 +4,9 @@ import java.io.Serializable;
 import java.util.Date;
 import java.util.List;
 
-import org.apache.log4j.Logger;
 import org.mongodb.morphia.Morphia;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import com.mongodb.MongoClient;
 
@@ -14,7 +15,6 @@ import main.java.com.jose.geolocation.exception.GeoProfileNotFoundException;
 import main.java.com.jose.geolocation.exception.GeoProfileServiceException;
 import main.java.com.jose.geolocation.listener.MongoClientManagerFactory;
 import main.java.com.jose.geolocation.vo.GeoProfileVo;
-import main.java.com.jose.geolocation.vo.LocationVo;
 
 
 /**
@@ -26,17 +26,24 @@ public class GeolocationService implements Serializable{
 	private static final long serialVersionUID = 2071937170723089158L;
 	
 	/** The Constant log. */
-	private static final Logger LOGGER = Logger.getLogger(GeolocationService.class.getName());
+	private static final Logger LOGGER = LoggerFactory.getLogger(GeolocationService.class.getName());
 	
-	
+	private MongoClient mongoClient;
+	private Morphia morphia;
+	private GeoProfileDAO geoProfileDAO;
 	
 	
 	/**
- * Instantiates a new geolocation service.
- */
-public GeolocationService(){
+	 * Instantiates a new geolocation service.
+ 	*/
+	public GeolocationService(){
 		super();
 		LOGGER.info("[GeolocationService - Constructor] - init");
+		
+		mongoClient = MongoClientManagerFactory.getMongoClientManager();
+		morphia = new Morphia();
+		morphia.map(GeoProfileVo.class);
+		geoProfileDAO = new GeoProfileDAO(morphia, mongoClient, MongoClientManagerFactory.getDatabase());
 	}
 	
 	/**
@@ -54,17 +61,8 @@ public GeolocationService(){
 			LOGGER.error("[GeolocationService - loadGeoProfileById] - id cannot be null");
 			throw new IllegalArgumentException();
 		}
-		
-		MongoClient mongoClient = MongoClientManagerFactory.getMongoClientManager();
-		//morphia:
-		Morphia morphia = new Morphia();
-		morphia.map(GeoProfileVo.class).map(LocationVo.class);
-		
-		//morphia dao:
-		GeoProfileDAO geoProfileDAO = new GeoProfileDAO(morphia, mongoClient, MongoClientManagerFactory.getDatabase());
-		
-		LOGGER.info("[GeolocationService - loadGeoProfileById] - loading geoProfileVo");
 		GeoProfileVo geoProfileVo = geoProfileDAO.findById(id);
+		
 		if(geoProfileVo == null){
 			LOGGER.error("[GeolocationService - loadGeoProfileById] - geoProfileVo not found");
 			throw new GeoProfileNotFoundException();
@@ -89,15 +87,7 @@ public GeolocationService(){
 			throw new IllegalArgumentException();
 		}
 		
-		MongoClient mongoClient = MongoClientManagerFactory.getMongoClientManager();
-		//morphia:
-		Morphia morphia = new Morphia();
-		morphia.map(GeoProfileVo.class).map(LocationVo.class);
-		
-		//morphia dao:
-		GeoProfileDAO geoProfileDAO = new GeoProfileDAO(morphia, mongoClient, MongoClientManagerFactory.getDatabase());
-		
-		LOGGER.info("[GeolocationService - deleteGeoProfileById] - deleting geoProfileVo");
+		LOGGER.info("[GeolocationService - deleteGeoProfileById] - deleting geoProfileVo id: {}",id);
 		geoProfileDAO.deleteById(id);
 
 		LOGGER.debug("[GeolocationService - deleteGeoProfileById] - Finish Timing:"+(System.currentTimeMillis()-currentSystemTime));
@@ -118,16 +108,6 @@ public GeolocationService(){
 			throw new IllegalArgumentException();
 		}
 		
-		MongoClient mongoClient = MongoClientManagerFactory.getMongoClientManager();
-		//morphia:
-		Morphia morphia = new Morphia();
-		morphia.map(GeoProfileVo.class).map(LocationVo.class);
-		
-		//morphia dao:
-		GeoProfileDAO geoProfileDAO = new GeoProfileDAO(morphia, mongoClient, MongoClientManagerFactory.getDatabase());
-	
-		LOGGER.info("[GeolocationService - createGeoProfile] - creating geoProfileVo");
-		
 		geoProfileVo.setDateCreation(new Date(System.currentTimeMillis()));
 		geoProfileDAO.saveGeoProfile(geoProfileVo);
 		
@@ -140,29 +120,21 @@ public GeolocationService(){
 	 *
 	 * @param listGeoProfileVo the list geo profile vo
 	 */
-	public void createListGeoProfile(List<GeoProfileVo> listGeoProfileVo){
+	public void createListGeoProfile(List<GeoProfileVo> geoProfileVoList){
 		LOGGER.info("[GeolocationService - createListGeoProfile] - init");
 		long currentSystemTime=System.currentTimeMillis();
 		
-		if(listGeoProfileVo == null || listGeoProfileVo.isEmpty()){
+		if(geoProfileVoList == null || geoProfileVoList.isEmpty()){
 			LOGGER.error("[GeolocationService - createListGeoProfile] - geoProfileVo cannot be null or empty");
 			throw new IllegalArgumentException();
 		}
 		
-		MongoClient mongoClient = MongoClientManagerFactory.getMongoClientManager();
-		//morphia:
-		Morphia morphia = new Morphia();
-		morphia.map(GeoProfileVo.class).map(LocationVo.class);
+		LOGGER.info("[GeolocationService - createListGeoProfile] - Creating listGeoProfileVo size:{}",geoProfileVoList.size());
 		
-		//morphia dao:
-		GeoProfileDAO geoProfileDAO = new GeoProfileDAO(morphia, mongoClient, MongoClientManagerFactory.getDatabase());
-		
-		LOGGER.info("[GeolocationService - createListGeoProfile] - Creating listGeoProfileVo");
-		
-		for(GeoProfileVo geo : listGeoProfileVo){
+		for(GeoProfileVo geo : geoProfileVoList){
 			geo.setDateCreation(new Date(System.currentTimeMillis()));
 		}		
-		geoProfileDAO.saveListGeoProfile(listGeoProfileVo);
+		geoProfileDAO.saveGeoProfiles(geoProfileVoList);
 		
 		LOGGER.debug("[GeolocationService - createListGeoProfile] - Finish Timing:"+(System.currentTimeMillis()-currentSystemTime));
 	}
@@ -193,21 +165,13 @@ public GeolocationService(){
 			throw new IllegalArgumentException();
 		}
 		
-		MongoClient mongoClient = MongoClientManagerFactory.getMongoClientManager();
-		//morphia:
-		Morphia morphia = new Morphia();
-		morphia.map(GeoProfileVo.class).map(LocationVo.class);
-		
-		//morphia dao:
-		GeoProfileDAO geoProfileDAO = new GeoProfileDAO(morphia, mongoClient, MongoClientManagerFactory.getDatabase());
-		
 		GeoProfileVo geoProfileVoEntity = geoProfileDAO.findById(geoProfileVo.getId());
 		if(geoProfileVoEntity==null){
 			LOGGER.error("[GeolocationService - updateGeoProfile] - geoProfileVo not found in BD");
 			throw new GeoProfileNotFoundException();
 		}
 		
-		LOGGER.info("[GeolocationService - updateGeoProfile] - updating geoProfileVo");
+		LOGGER.info("[GeolocationService - updateGeoProfile] - updating geoProfileVo id:{}",geoProfileVo.getId());
 		geoProfileVo.setDateModification(new Date(System.currentTimeMillis()));
 		geoProfileDAO.updateGeoProfile(geoProfileVo, copyIfNull);
 		

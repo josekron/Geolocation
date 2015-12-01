@@ -12,33 +12,26 @@ import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
+import javax.ws.rs.core.Response.Status;
 
-import org.apache.log4j.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import com.google.gson.Gson;
 
 import main.java.com.jose.geolocation.exception.GeoProfileNotFoundException;
-import main.java.com.jose.geolocation.exception.GeoProfileServiceException;
 import main.java.com.jose.geolocation.service.GeolocationService;
 import main.java.com.jose.geolocation.vo.GeoProfileVo;
-import main.java.com.jose.geolocation.vo.ResponseVo;
 
 
 /**
  * The Class GeolocationWs.
  */
-@Path("/GeolocationWs")
+@Path("/Geolocation")
 public class GeolocationWs {
-	
-	/** The Constant OK. */
-	private static final int OK=200;
 
 	/** The Constant log. */
-	private static final Logger LOGGER = Logger.getLogger(GeolocationWs.class.getName());
-	
-	/** Response Codes **/
-	private static final Integer codeOK = 200;
-	private static final Integer codeError = 500;
+	private static final Logger LOGGER = LoggerFactory.getLogger(GeolocationWs.class.getName());
 	
 	/** The geolocation service. */
 	@Inject
@@ -52,7 +45,7 @@ public class GeolocationWs {
 	 * @return the response
 	 */
 	@GET
-	@Path("/loadGeoProfileById/{id}")
+	@Path("/{id}")
 	@Produces(MediaType.APPLICATION_JSON)
 	public Response loadGeoProfileById(@PathParam("id")String id){
 		
@@ -68,28 +61,25 @@ public class GeolocationWs {
 				throw new IllegalArgumentException("id cannot be null");
 			
 			geoProfileVo = geolocationService.loadGeoProfileById(id);
-			geoProfileVo.setErrorCode(codeOK);
+			
 			json = gson.toJson(geoProfileVo);
+			return Response.ok(json, MediaType.APPLICATION_JSON).build();
 			
 		}catch (IllegalArgumentException ex) {
 			LOGGER.error("[GeolocationWs - deleteGeoProfileById] - Error: "+ex);
-			geoProfileVo.setErrorCode(codeError);
-			geoProfileVo.setErrorMessage(ex.toString());
-			json = gson.toJson(geoProfileVo);
+			return Response.serverError().status(Status.BAD_REQUEST).build();
 			
 		}catch (GeoProfileNotFoundException ex) {
 			LOGGER.error("[GeolocationWs - loadGeoProfileById] - Error: "+ex);
-			geoProfileVo.setErrorCode(codeError);
-			geoProfileVo.setErrorMessage(ex.toString());
-			json = gson.toJson(geoProfileVo);
+			return Response.serverError().status(Status.NOT_FOUND).build();
+			
+		}catch(Exception ex){
+			LOGGER.error("[GeolocationWs - loadGeoProfileById] - Error: "+ex);
+			return Response.serverError().status(Status.INTERNAL_SERVER_ERROR).build();
+			
 		}finally{
 			LOGGER.info("[GeolocationWs - loadGeoProfileById] - Finish Timing:"+(System.currentTimeMillis()-currentSystemTime));
 		}
-		
-		if(geoProfileVo.getErrorCode()==OK)
-			return Response.ok(json, MediaType.APPLICATION_JSON).build();
-		else
-			return Response.serverError().status(geoProfileVo.getErrorCode()).entity(json).build();
 	}
 	
 	/**
@@ -99,45 +89,35 @@ public class GeolocationWs {
 	 * @return the response
 	 */
 	@GET
-	@Path("/deleteGeoProfileById/{id}")
+	@Path("/{id}/delete")
 	@Produces(MediaType.APPLICATION_JSON)
 	public Response deleteGeoProfileById(@PathParam("id")String id){
 		
 		LOGGER.info("[GeolocationWs - deleteGeoProfileById] - init");
 		long currentSystemTime = System.currentTimeMillis();
-		
-		String json = null;
-		Gson gson = new Gson();
-		ResponseVo responseVo = new ResponseVo();
-		
+
 		try {
 			if(id == null)
 				throw new IllegalArgumentException("id cannot be null");
 			
 			geolocationService.deleteGeoProfileById(id);
-			responseVo.setErrorCode(codeOK);
-			json = gson.toJson(responseVo);
+			return Response.ok().build();
 			
 		}catch (IllegalArgumentException ex) {
 			LOGGER.error("[GeolocationWs - deleteGeoProfileById] - Error: "+ex);
-			responseVo.setErrorCode(codeError);
-			responseVo.setErrorMessage(ex.toString());
-			json = gson.toJson(responseVo);
+			return Response.serverError().status(Status.BAD_REQUEST).build();
 			
 		}catch (GeoProfileNotFoundException ex) {
 			LOGGER.error("[GeolocationWs - deleteGeoProfileById] - Error: "+ex);
-			responseVo.setErrorCode(codeError);
-			responseVo.setErrorMessage(ex.toString());
-			json = gson.toJson(responseVo);
+			return Response.serverError().status(Status.NOT_FOUND).build();
+			
+		}catch (Exception ex) {
+			LOGGER.error("[GeolocationWs - deleteGeoProfileById] - Error: "+ex);
+			return Response.serverError().status(Status.INTERNAL_SERVER_ERROR).build();
+			
 		}finally{
 			LOGGER.info("[GeolocationWs - deleteGeoProfileById] - Finish Timing:"+(System.currentTimeMillis()-currentSystemTime));
 		}
-		
-
-		if(responseVo.getErrorCode()==OK)
-			return Response.ok(json, MediaType.APPLICATION_JSON).build();
-		else
-			return Response.serverError().status(responseVo.getErrorCode()).entity(json).build();
 	}
 	
 	/**
@@ -147,39 +127,32 @@ public class GeolocationWs {
 	 * @return the response
 	 */
 	@POST
-	@Path("/createGeoProfile")
+	@Path("/create")
 	@Consumes(MediaType.APPLICATION_JSON)
 	@Produces(MediaType.APPLICATION_JSON)
 	public Response createGeoProfile(GeoProfileVo geoProfileVo){
 		
 		LOGGER.info("[GeolocationWs - createGeolocation] - init");
 		long currentSystemTime = System.currentTimeMillis();
-		
-		String json = null;
-		Gson gson = new Gson();
-		ResponseVo responseVo = new ResponseVo();
+
 		try{
 			if(geoProfileVo == null)
 				throw new IllegalArgumentException("geoProfileVo cannot be null");
 			
 			geolocationService.createGeoProfile(geoProfileVo);
-			responseVo.setErrorCode(codeOK);
-			json = gson.toJson(responseVo);
+			return Response.ok().build();
 			
 		}catch (IllegalArgumentException ex) {
 			LOGGER.error("[GeolocationWs - createGeolocation] - Error: "+ex);
-			responseVo.setErrorCode(codeError);
-			responseVo.setErrorMessage(ex.toString());
-			json = gson.toJson(responseVo);
+			return Response.serverError().status(Status.BAD_REQUEST).build();
+			
+		}catch (Exception ex) {
+			LOGGER.error("[GeolocationWs - createGeolocation] - Error: "+ex);
+			return Response.serverError().status(Status.INTERNAL_SERVER_ERROR).build();
 			
 		}finally{
 			LOGGER.info("[GeolocationWs - createGeolocation] - Finish Timing:"+(System.currentTimeMillis()-currentSystemTime));
 		}
-		
-		if(responseVo.getErrorCode()==OK)
-			return Response.ok(json, MediaType.APPLICATION_JSON).build();
-		else
-			return Response.serverError().status(responseVo.getErrorCode()).entity(json).build();
 
 	}
 	
@@ -190,17 +163,14 @@ public class GeolocationWs {
 	 * @return the response
 	 */
 	@POST
-	@Path("/createListGeoProfile")
+	@Path("/createList")
 	@Consumes(MediaType.APPLICATION_JSON)
 	@Produces(MediaType.APPLICATION_JSON)
 	public Response createListGeoProfile(List<GeoProfileVo> listGeoProfileVo){
 		
 		LOGGER.info("[GeolocationWs - createListGeoProfile] - init");
 		long currentSystemTime = System.currentTimeMillis();
-		
-		String json = null;
-		Gson gson = new Gson();
-		ResponseVo responseVo = new ResponseVo();
+
 		try{
 			if(listGeoProfileVo == null || listGeoProfileVo.isEmpty()){
 				LOGGER.error("[GeolocationService - createListGeoProfile] - geoProfileVo cannot be null or empty");
@@ -208,23 +178,19 @@ public class GeolocationWs {
 			}
 			
 			geolocationService.createListGeoProfile(listGeoProfileVo);
-			responseVo.setErrorCode(codeOK);
-			json = gson.toJson(responseVo);
+			return Response.ok().build();
 			
 		}catch (IllegalArgumentException ex) {
 			LOGGER.error("[GeolocationWs - createListGeoProfile] - Error: "+ex);
-			responseVo.setErrorCode(codeError);
-			responseVo.setErrorMessage(ex.toString());
-			json = gson.toJson(responseVo);
+			return Response.serverError().status(Status.BAD_REQUEST).build();
+			
+		}catch (Exception ex) {
+			LOGGER.error("[GeolocationWs - createListGeoProfile] - Error: "+ex);
+			return Response.serverError().status(Status.INTERNAL_SERVER_ERROR).build();
 			
 		}finally{
 			LOGGER.info("[GeolocationWs - createListGeoProfile] - Finish Timing:"+(System.currentTimeMillis()-currentSystemTime));
 		}
-
-		if(responseVo.getErrorCode()==OK)
-			return Response.ok(json, MediaType.APPLICATION_JSON).build();
-		else
-			return Response.serverError().status(responseVo.getErrorCode()).entity(json).build();
 
 	}
 	
@@ -235,7 +201,7 @@ public class GeolocationWs {
 	 * @return the response
 	 */
 	@POST
-	@Path("/updateGeoProfile")
+	@Path("/update")
 	@Consumes(MediaType.APPLICATION_JSON)
 	@Produces(MediaType.APPLICATION_JSON)
 	public Response updateGeoProfile(GeoProfileVo geoProfileVo){
@@ -243,42 +209,28 @@ public class GeolocationWs {
 		LOGGER.info("[GeolocationWs - updateGeoProfile] - init");
 		long currentSystemTime = System.currentTimeMillis();
 		
-		String json = null;
-		Gson gson = new Gson();
-		ResponseVo responseVo = new ResponseVo();
-		
 		try {
 			if(geoProfileVo == null)
 				throw new IllegalArgumentException("geoProfileVo cannot be null");
 			
 			geolocationService.updateGeoProfile(geoProfileVo,false);
-			responseVo.setErrorCode(codeOK);
-			json = gson.toJson(responseVo);
+			return Response.ok().build();
 			
 		}catch (IllegalArgumentException ex) {
 			LOGGER.error("[GeolocationWs - updateGeoProfile] - Error: "+ex);
-			responseVo.setErrorCode(codeError);
-			responseVo.setErrorMessage(ex.toString());
-			json = gson.toJson(responseVo);
+			return Response.serverError().status(Status.BAD_REQUEST).build();
 			
 		}catch (GeoProfileNotFoundException ex) {
 			LOGGER.error("[GeolocationWs - updateGeoProfile] - Error: "+ex);
-			responseVo.setErrorCode(codeError);
-			responseVo.setErrorMessage(ex.toString());
-			json = gson.toJson(responseVo);
-		}catch (GeoProfileServiceException ex) {
+			return Response.serverError().status(Status.NOT_FOUND).build();
+			
+		}catch (Exception ex) {
 			LOGGER.error("[GeolocationWs - updateGeoProfile] - Error: "+ex);
-			responseVo.setErrorCode(codeError);
-			responseVo.setErrorMessage(ex.toString());
-			json = gson.toJson(responseVo);
+			return Response.serverError().status(Status.INTERNAL_SERVER_ERROR).build();
+			
 		}finally{
 			LOGGER.info("[GeolocationWs - updateGeoProfile] - Finish Timing:"+(System.currentTimeMillis()-currentSystemTime));
 		}
-		
-		if(responseVo.getErrorCode()==OK)
-			return Response.ok(json, MediaType.APPLICATION_JSON).build();
-		else
-			return Response.serverError().status(responseVo.getErrorCode()).entity(json).build();
 
 	}
 }
