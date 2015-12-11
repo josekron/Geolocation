@@ -51,6 +51,16 @@ public class GeoProfileDAO extends BasicDAO<GeoProfileVo, ObjectId>{
 	}
 	
 	/**
+	 * Find All.
+	 * @return the geo profile vo List
+	 */
+	public List<GeoProfileVo> findAll (){
+		LOGGER.info("[GeoProfileDAO - findAll] - init");
+
+		return getDs().find(GeoProfileVo.class).asList();
+	}
+	
+	/**
 	 * Delete by id.
 	 *
 	 * @param id the id

@@ -1,7 +1,9 @@
 package main.java.com.jose.geolocation.ws;
 
 
+import java.util.Arrays;
 import java.util.List;
+import java.util.stream.Collectors;
 
 import javax.inject.Inject;
 import javax.ws.rs.Consumes;
@@ -27,7 +29,7 @@ import main.java.com.jose.geolocation.vo.GeoProfileVo;
 /**
  * The Class GeolocationWs.
  */
-@Path("/Geolocation")
+@Path("/geo")
 public class GeolocationWs {
 
 	/** The Constant log. */
@@ -37,6 +39,68 @@ public class GeolocationWs {
 	@Inject
 	GeolocationService geolocationService;
 
+	
+	@GET
+	@Path("/all")
+	@Produces(MediaType.APPLICATION_JSON)
+	public Response loadAllGeoProfiles(){
+		
+		LOGGER.info("[GeolocationWs - loadAllGeoProfiles] - init");
+		long currentSystemTime = System.currentTimeMillis();
+		
+		String json = null;
+		Gson gson = new Gson();
+
+		try {
+	
+			List<GeoProfileVo>geoProfileVoList = geolocationService.loadAllGeoProfile();
+			
+			json = gson.toJson(geoProfileVoList);
+			return Response.ok(json, MediaType.APPLICATION_JSON).build();
+			
+		}catch (IllegalArgumentException ex) {
+			LOGGER.error("[GeolocationWs - loadAllGeoProfiles] - Error: "+ex);
+			return Response.serverError().status(Status.BAD_REQUEST).build();
+			
+		}catch(Exception ex){
+			LOGGER.error("[GeolocationWs - loadAllGeoProfiles] - Error: "+ex);
+			return Response.serverError().status(Status.INTERNAL_SERVER_ERROR).build();
+			
+		}finally{
+			LOGGER.info("[GeolocationWs - loadAllGeoProfiles] - Finish Timing:"+(System.currentTimeMillis()-currentSystemTime));
+		}
+	}
+	
+	@GET
+	@Path("/allEmails")
+	@Produces(MediaType.APPLICATION_JSON)
+	public Response loadAllEmails(){
+		LOGGER.info("[GeolocationWs - loadAllEmails] - init");
+		long currentSystemTime = System.currentTimeMillis();
+		
+		String json = null;
+		Gson gson = new Gson();
+
+		try {
+	
+			List<GeoProfileVo>geoProfileVoList = geolocationService.loadAllGeoProfile();
+			List<String> emails = geoProfileVoList.stream().map( geoProfileVo -> geoProfileVo.getEmail()).collect(Collectors.toList());
+			
+			json = gson.toJson(emails);
+			return Response.ok(json, MediaType.APPLICATION_JSON).build();
+			
+		}catch (IllegalArgumentException ex) {
+			LOGGER.error("[GeolocationWs - loadAllEmails] - Error: "+ex);
+			return Response.serverError().status(Status.BAD_REQUEST).build();
+			
+		}catch(Exception ex){
+			LOGGER.error("[GeolocationWs - loadAllEmails] - Error: "+ex);
+			return Response.serverError().status(Status.INTERNAL_SERVER_ERROR).build();
+			
+		}finally{
+			LOGGER.info("[GeolocationWs - loadAllEmails] - Finish Timing:"+(System.currentTimeMillis()-currentSystemTime));
+		}
+	}
 	
 	/**
 	 * Load geo profile by id.
@@ -66,7 +130,7 @@ public class GeolocationWs {
 			return Response.ok(json, MediaType.APPLICATION_JSON).build();
 			
 		}catch (IllegalArgumentException ex) {
-			LOGGER.error("[GeolocationWs - deleteGeoProfileById] - Error: "+ex);
+			LOGGER.error("[GeolocationWs - loadGeoProfileById] - Error: "+ex);
 			return Response.serverError().status(Status.BAD_REQUEST).build();
 			
 		}catch (GeoProfileNotFoundException ex) {

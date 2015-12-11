@@ -73,6 +73,20 @@ public class GeolocationService implements Serializable{
 	}
 	
 	/**
+	 * Load all geo profile.
+	 * @return the geo profile vo list
+	 */
+	public List<GeoProfileVo> loadAllGeoProfile() {
+		LOGGER.info("[GeolocationService - loadAllGeoProfile] - init");
+		long currentSystemTime=System.currentTimeMillis();
+
+		List<GeoProfileVo> geoProfileVoList = geoProfileDAO.findAll();
+		
+		LOGGER.debug("[GeolocationService - loadAllGeoProfile] - Finish Timing:"+(System.currentTimeMillis()-currentSystemTime));
+		return geoProfileVoList;
+	}
+	
+	/**
 	 * Delete geo profile by id.
 	 *
 	 * @param id the id
