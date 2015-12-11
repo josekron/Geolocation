@@ -10,6 +10,8 @@ I use Maven to add the dependencies in the pom.xml file.
 
 - Log4j: this project has integrated a system log with Log4j.
 
+- Introducing somes feactures of Java 8.
+
 #Advices
 
 - Don´t forget that MongoDB required only one instance, so you must initialize it in the Listener.
