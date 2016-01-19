@@ -1,0 +1,6 @@
+<mongoClient>
+	<host>127.0.0.1</host>
+	<port>27017</port>
+	<connectionsPerHost>200</connectionsPerHost>
+	<database>takebread_db</database>
+</mongoClient>
