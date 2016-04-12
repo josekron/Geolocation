@@ -8,6 +8,7 @@ import javax.inject.Inject;
 import javax.ws.rs.Consumes;
 import javax.ws.rs.GET;
 import javax.ws.rs.POST;
+import javax.ws.rs.PUT;
 import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
@@ -32,6 +33,8 @@ public class GeolocationWs {
 
 	/** The Constant log. */
 	private static final Logger LOGGER = LoggerFactory.getLogger(GeolocationWs.class.getName());
+	
+	private static final Integer ERROR_NOT_PROCESS = 422;
 	
 	/** The geolocation service. */
 	@Inject
@@ -62,7 +65,7 @@ public class GeolocationWs {
 			
 		}catch(Exception ex){
 			LOGGER.error("[GeolocationWs - loadAllGeoProfiles] - Error: "+ex);
-			return Response.serverError().status(Status.INTERNAL_SERVER_ERROR).build();
+			return Response.serverError().status(ERROR_NOT_PROCESS).build();
 			
 		}finally{
 			LOGGER.info("[GeolocationWs - loadAllGeoProfiles] - Finish Timing:"+(System.currentTimeMillis()-currentSystemTime));
@@ -70,7 +73,7 @@ public class GeolocationWs {
 	}
 	
 	@GET
-	@Path("/allEmails")
+	@Path("/emails")
 	@Produces(MediaType.APPLICATION_JSON)
 	public Response loadAllEmails(){
 		LOGGER.info("[GeolocationWs - loadAllEmails] - init");
@@ -93,7 +96,7 @@ public class GeolocationWs {
 			
 		}catch(Exception ex){
 			LOGGER.error("[GeolocationWs - loadAllEmails] - Error: "+ex);
-			return Response.serverError().status(Status.INTERNAL_SERVER_ERROR).build();
+			return Response.serverError().status(ERROR_NOT_PROCESS).build();
 			
 		}finally{
 			LOGGER.info("[GeolocationWs - loadAllEmails] - Finish Timing:"+(System.currentTimeMillis()-currentSystemTime));
@@ -137,7 +140,7 @@ public class GeolocationWs {
 			
 		}catch(Exception ex){
 			LOGGER.error("[GeolocationWs - loadGeoProfileById] - Error: "+ex);
-			return Response.serverError().status(Status.INTERNAL_SERVER_ERROR).build();
+			return Response.serverError().status(ERROR_NOT_PROCESS).build();
 			
 		}finally{
 			LOGGER.info("[GeolocationWs - loadGeoProfileById] - Finish Timing:"+(System.currentTimeMillis()-currentSystemTime));
@@ -150,7 +153,7 @@ public class GeolocationWs {
 	 * @param id the id
 	 * @return the response
 	 */
-	@GET
+	@POST
 	@Path("/{id}/delete")
 	@Produces(MediaType.APPLICATION_JSON)
 	public Response deleteGeoProfileById(@PathParam("id")String id){
@@ -175,7 +178,7 @@ public class GeolocationWs {
 			
 		}catch (Exception ex) {
 			LOGGER.error("[GeolocationWs - deleteGeoProfileById] - Error: "+ex);
-			return Response.serverError().status(Status.INTERNAL_SERVER_ERROR).build();
+			return Response.serverError().status(ERROR_NOT_PROCESS).build();
 			
 		}finally{
 			LOGGER.info("[GeolocationWs - deleteGeoProfileById] - Finish Timing:"+(System.currentTimeMillis()-currentSystemTime));
@@ -189,7 +192,7 @@ public class GeolocationWs {
 	 * @return the response
 	 */
 	@POST
-	@Path("/create")
+	@Path("/")
 	@Consumes(MediaType.APPLICATION_JSON)
 	@Produces(MediaType.APPLICATION_JSON)
 	public Response createGeoProfile(GeoProfileVo geoProfileVo){
@@ -202,7 +205,7 @@ public class GeolocationWs {
 				throw new IllegalArgumentException("geoProfileVo cannot be null");
 			
 			geolocationService.createGeoProfile(geoProfileVo);
-			return Response.ok().build();
+			return Response.status(Status.CREATED).build();
 			
 		}catch (IllegalArgumentException ex) {
 			LOGGER.error("[GeolocationWs - createGeolocation] - Error: "+ex);
@@ -210,7 +213,7 @@ public class GeolocationWs {
 			
 		}catch (Exception ex) {
 			LOGGER.error("[GeolocationWs - createGeolocation] - Error: "+ex);
-			return Response.serverError().status(Status.INTERNAL_SERVER_ERROR).build();
+			return Response.serverError().status(ERROR_NOT_PROCESS).build();
 			
 		}finally{
 			LOGGER.info("[GeolocationWs - createGeolocation] - Finish Timing:"+(System.currentTimeMillis()-currentSystemTime));
@@ -225,7 +228,7 @@ public class GeolocationWs {
 	 * @return the response
 	 */
 	@POST
-	@Path("/createList")
+	@Path("/list")
 	@Consumes(MediaType.APPLICATION_JSON)
 	@Produces(MediaType.APPLICATION_JSON)
 	public Response createListGeoProfile(List<GeoProfileVo> listGeoProfileVo){
@@ -240,7 +243,7 @@ public class GeolocationWs {
 			}
 			
 			geolocationService.createListGeoProfile(listGeoProfileVo);
-			return Response.ok().build();
+			return Response.status(Status.CREATED).build();
 			
 		}catch (IllegalArgumentException ex) {
 			LOGGER.error("[GeolocationWs - createListGeoProfile] - Error: "+ex);
@@ -248,7 +251,7 @@ public class GeolocationWs {
 			
 		}catch (Exception ex) {
 			LOGGER.error("[GeolocationWs - createListGeoProfile] - Error: "+ex);
-			return Response.serverError().status(Status.INTERNAL_SERVER_ERROR).build();
+			return Response.serverError().status(ERROR_NOT_PROCESS).build();
 			
 		}finally{
 			LOGGER.info("[GeolocationWs - createListGeoProfile] - Finish Timing:"+(System.currentTimeMillis()-currentSystemTime));
@@ -262,7 +265,7 @@ public class GeolocationWs {
 	 * @param geoProfileVo the geo profile vo
 	 * @return the response
 	 */
-	@POST
+	@PUT
 	@Path("/update")
 	@Consumes(MediaType.APPLICATION_JSON)
 	@Produces(MediaType.APPLICATION_JSON)
@@ -288,7 +291,7 @@ public class GeolocationWs {
 			
 		}catch (Exception ex) {
 			LOGGER.error("[GeolocationWs - updateGeoProfile] - Error: "+ex);
-			return Response.serverError().status(Status.INTERNAL_SERVER_ERROR).build();
+			return Response.serverError().status(ERROR_NOT_PROCESS).build();
 			
 		}finally{
 			LOGGER.info("[GeolocationWs - updateGeoProfile] - Finish Timing:"+(System.currentTimeMillis()-currentSystemTime));
