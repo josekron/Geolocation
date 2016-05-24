@@ -8,7 +8,6 @@ import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlRootElement;
 
 import org.mongodb.morphia.annotations.Entity;
-import org.mongodb.morphia.annotations.Embedded;
 import org.mongodb.morphia.annotations.Id;
 
 /**
@@ -29,8 +28,7 @@ public class GeoProfileVo implements Serializable{
 	private String email;
 	
 	/** The location. */
-	@Embedded
-	private LocationVo location;
+	private Double[] coordinates;
 	
 	
 	/** The date creation. */
@@ -57,11 +55,11 @@ public class GeoProfileVo implements Serializable{
 	 * @param dateCreation the date creation
 	 * @param dateModification the date modification
 	 */
-	public GeoProfileVo(String id, String email, LocationVo location,Date dateCreation, Date dateModification) {
+	public GeoProfileVo(String id, String email, Double[] coordinates,Date dateCreation, Date dateModification) {
 		super();
 		this.id = id;
 		this.email = email;
-		this.location = location;
+		this.coordinates = coordinates;
 		this.dateCreation = dateCreation;
 		this.dateModification = dateModification;
 	}
@@ -103,24 +101,15 @@ public class GeoProfileVo implements Serializable{
 		this.email = email;
 	}
 
-	/**
-	 * Gets the location.
-	 *
-	 * @return the location
-	 */
-	public LocationVo getLocation() {
-		return location;
+
+	public Double[] getCoordinates() {
+		return coordinates;
 	}
 
-	/**
-	 * Sets the location.
-	 *
-	 * @param location the new location
-	 */
-	public void setLocation(LocationVo location) {
-		this.location = location;
+	
+	public void setCoordinates(Double[] coordinates) {
+		this.coordinates = coordinates;
 	}
-
 
 	/**
 	 * Gets the date creation.
@@ -158,13 +147,11 @@ public class GeoProfileVo implements Serializable{
 		this.dateModification = dateModification;
 	}
 
-	/* (non-Javadoc)
-	 * @see main.java.com.nubbler.geolocation.vo.ResponseVo#toString()
-	 */
+
 	@Override
 	public String toString() {
-		return "GeoProfileVo [id=" + id + ", email=" + email + ", location="
-				+ location + ", dateCreation=" + dateCreation
+		return "GeoProfileVo [id=" + id + ", email=" + email + ", coordinates="
+				+ coordinates + ", dateCreation=" + dateCreation
 				+ ", dateModification=" + dateModification + "]";
 	}
 

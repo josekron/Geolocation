@@ -85,6 +85,34 @@ public class GeolocationService implements Serializable{
 		return geoProfileVoList;
 	}
 	
+	
+	public List<GeoProfileVo> loadByCoordinates(Double latitude, Double longitude, Double radius){
+		LOGGER.info("[GeolocationService - loadByCoordinates] - init");
+		long currentSystemTime=System.currentTimeMillis();
+		
+		try{
+			if(latitude == null)
+				throw new IllegalArgumentException("latitude cannot be null");
+			if(longitude == null)
+				throw new IllegalArgumentException("longitude cannot be null");
+			if(radius == null)
+				throw new IllegalArgumentException("radius cannot be null");
+			
+			List<GeoProfileVo> items = geoProfileDAO.findByCoordinates(latitude, longitude, radius);
+			LOGGER.debug("[GeolocationService - loadByCoordinates] - Loaded list size: {} by coordenates: [{} , {}]", items.size(),latitude,longitude);
+			return items;
+			
+		}catch(IllegalArgumentException ex){
+			LOGGER.error("[GeolocationService - loadByCoordinates] - error: {}",ex);
+			throw ex;
+		}catch(Exception ex){
+			LOGGER.error("[GeolocationService - loadByCoordinates] - error: {}",ex);
+			throw ex;
+		}finally{
+			LOGGER.debug("[GeolocationService - loadByCoordinates] - Finish Timing:"+(System.currentTimeMillis()-currentSystemTime));
+		}
+	}
+	
 	/**
 	 * Delete geo profile by id.
 	 *

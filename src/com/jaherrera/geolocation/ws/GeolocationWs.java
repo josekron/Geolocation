@@ -12,6 +12,7 @@ import javax.ws.rs.PUT;
 import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
+import javax.ws.rs.QueryParam;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.Response.Status;
@@ -34,7 +35,7 @@ public class GeolocationWs {
 	/** The Constant log. */
 	private static final Logger LOGGER = LoggerFactory.getLogger(GeolocationWs.class.getName());
 	
-	private static final Integer ERROR_NOT_PROCESS = 422;
+	private static Double FORMAT_RADIUS = 0.01;
 	
 	/** The geolocation service. */
 	@Inject
@@ -60,15 +61,55 @@ public class GeolocationWs {
 			return Response.ok(json, MediaType.APPLICATION_JSON).build();
 			
 		}catch (IllegalArgumentException ex) {
-			LOGGER.error("[GeolocationWs - loadAllGeoProfiles] - Error: "+ex);
+			LOGGER.error("[GeolocationWs - loadAllGeoProfiles] - Error: {}",ex);
 			return Response.serverError().status(Status.BAD_REQUEST).build();
 			
 		}catch(Exception ex){
-			LOGGER.error("[GeolocationWs - loadAllGeoProfiles] - Error: "+ex);
-			return Response.serverError().status(ERROR_NOT_PROCESS).build();
+			LOGGER.error("[GeolocationWs - loadAllGeoProfiles] - Error: {}",ex);
+			return Response.serverError().status(Status.INTERNAL_SERVER_ERROR).build();
 			
 		}finally{
 			LOGGER.info("[GeolocationWs - loadAllGeoProfiles] - Finish Timing:"+(System.currentTimeMillis()-currentSystemTime));
+		}
+	}
+	
+	@GET
+	@Path("/nearby")
+	@Consumes(MediaType.APPLICATION_JSON)
+	@Produces(MediaType.APPLICATION_JSON)
+	public Response loadByCoordinates(@QueryParam("latitude") Double latitude, @QueryParam("longitude") Double longitude, @QueryParam("radius") Integer radius){
+		
+		LOGGER.info("[GeolocationWs - loadByCoordinates] - init");
+		long currentSystemTime = System.currentTimeMillis();
+		
+		String json = null;
+		Gson gson = new Gson();
+		
+		try{
+			if(latitude == null)
+				throw new IllegalArgumentException("latitude cannot be null");
+			if(longitude == null)
+				throw new IllegalArgumentException("longitude cannot be null");
+			if(radius == null)
+				throw new IllegalArgumentException("radius cannot be null");
+			
+			Double radius_format = radius * FORMAT_RADIUS;
+			
+			LOGGER.info("[GeolocationWs - loadByCoordinates] - load geoProfiles nearby Coordenates: [{} , {}]",latitude, longitude);
+			List<GeoProfileVo> profiles = geolocationService.loadByCoordinates(latitude, longitude, radius_format);
+
+			json = gson.toJson(profiles);
+
+			return Response.ok(json, MediaType.APPLICATION_JSON).build();
+			
+		}catch (IllegalArgumentException ex) {
+			LOGGER.error("[GeolocationWs - loadByCoordinates] - Error: {}",ex);
+			return Response.serverError().status(Status.BAD_REQUEST).build();
+		}catch(Exception ex){
+			LOGGER.error("[GeolocationWs - loadByCoordinates] - Error: {}",ex);
+			return Response.serverError().status(Status.INTERNAL_SERVER_ERROR).build();
+		}finally{
+			LOGGER.info("[ItemWs - loadByCoordinates] - Finish Timing:"+(System.currentTimeMillis()-currentSystemTime));
 		}
 	}
 	
@@ -91,12 +132,12 @@ public class GeolocationWs {
 			return Response.ok(json, MediaType.APPLICATION_JSON).build();
 			
 		}catch (IllegalArgumentException ex) {
-			LOGGER.error("[GeolocationWs - loadAllEmails] - Error: "+ex);
+			LOGGER.error("[GeolocationWs - loadAllEmails] - Error: {}",ex);
 			return Response.serverError().status(Status.BAD_REQUEST).build();
 			
 		}catch(Exception ex){
-			LOGGER.error("[GeolocationWs - loadAllEmails] - Error: "+ex);
-			return Response.serverError().status(ERROR_NOT_PROCESS).build();
+			LOGGER.error("[GeolocationWs - loadAllEmails] - Error: {}",ex);
+			return Response.serverError().status(Status.INTERNAL_SERVER_ERROR).build();
 			
 		}finally{
 			LOGGER.info("[GeolocationWs - loadAllEmails] - Finish Timing:"+(System.currentTimeMillis()-currentSystemTime));
@@ -131,16 +172,16 @@ public class GeolocationWs {
 			return Response.ok(json, MediaType.APPLICATION_JSON).build();
 			
 		}catch (IllegalArgumentException ex) {
-			LOGGER.error("[GeolocationWs - loadGeoProfileById] - Error: "+ex);
+			LOGGER.error("[GeolocationWs - loadGeoProfileById] - Error: {}",ex);
 			return Response.serverError().status(Status.BAD_REQUEST).build();
 			
 		}catch (GeoProfileNotFoundException ex) {
-			LOGGER.error("[GeolocationWs - loadGeoProfileById] - Error: "+ex);
+			LOGGER.error("[GeolocationWs - loadGeoProfileById] - Error: {}",ex);
 			return Response.serverError().status(Status.NOT_FOUND).build();
 			
 		}catch(Exception ex){
-			LOGGER.error("[GeolocationWs - loadGeoProfileById] - Error: "+ex);
-			return Response.serverError().status(ERROR_NOT_PROCESS).build();
+			LOGGER.error("[GeolocationWs - loadGeoProfileById] - Error: {}",ex);
+			return Response.serverError().status(Status.INTERNAL_SERVER_ERROR).build();
 			
 		}finally{
 			LOGGER.info("[GeolocationWs - loadGeoProfileById] - Finish Timing:"+(System.currentTimeMillis()-currentSystemTime));
@@ -178,7 +219,7 @@ public class GeolocationWs {
 			
 		}catch (Exception ex) {
 			LOGGER.error("[GeolocationWs - deleteGeoProfileById] - Error: "+ex);
-			return Response.serverError().status(ERROR_NOT_PROCESS).build();
+			return Response.serverError().status(Status.INTERNAL_SERVER_ERROR).build();
 			
 		}finally{
 			LOGGER.info("[GeolocationWs - deleteGeoProfileById] - Finish Timing:"+(System.currentTimeMillis()-currentSystemTime));
@@ -208,12 +249,12 @@ public class GeolocationWs {
 			return Response.status(Status.CREATED).build();
 			
 		}catch (IllegalArgumentException ex) {
-			LOGGER.error("[GeolocationWs - createGeolocation] - Error: "+ex);
+			LOGGER.error("[GeolocationWs - createGeolocation] - Error: {}",ex);
 			return Response.serverError().status(Status.BAD_REQUEST).build();
 			
 		}catch (Exception ex) {
-			LOGGER.error("[GeolocationWs - createGeolocation] - Error: "+ex);
-			return Response.serverError().status(ERROR_NOT_PROCESS).build();
+			LOGGER.error("[GeolocationWs - createGeolocation] - Error: {}",ex);
+			return Response.serverError().status(Status.INTERNAL_SERVER_ERROR).build();
 			
 		}finally{
 			LOGGER.info("[GeolocationWs - createGeolocation] - Finish Timing:"+(System.currentTimeMillis()-currentSystemTime));
@@ -246,12 +287,12 @@ public class GeolocationWs {
 			return Response.status(Status.CREATED).build();
 			
 		}catch (IllegalArgumentException ex) {
-			LOGGER.error("[GeolocationWs - createListGeoProfile] - Error: "+ex);
+			LOGGER.error("[GeolocationWs - createListGeoProfile] - Error: {}",ex);
 			return Response.serverError().status(Status.BAD_REQUEST).build();
 			
 		}catch (Exception ex) {
-			LOGGER.error("[GeolocationWs - createListGeoProfile] - Error: "+ex);
-			return Response.serverError().status(ERROR_NOT_PROCESS).build();
+			LOGGER.error("[GeolocationWs - createListGeoProfile] - Error: {}",ex);
+			return Response.serverError().status(Status.INTERNAL_SERVER_ERROR).build();
 			
 		}finally{
 			LOGGER.info("[GeolocationWs - createListGeoProfile] - Finish Timing:"+(System.currentTimeMillis()-currentSystemTime));
@@ -282,16 +323,16 @@ public class GeolocationWs {
 			return Response.ok().build();
 			
 		}catch (IllegalArgumentException ex) {
-			LOGGER.error("[GeolocationWs - updateGeoProfile] - Error: "+ex);
+			LOGGER.error("[GeolocationWs - updateGeoProfile] - Error: {}",ex);
 			return Response.serverError().status(Status.BAD_REQUEST).build();
 			
 		}catch (GeoProfileNotFoundException ex) {
-			LOGGER.error("[GeolocationWs - updateGeoProfile] - Error: "+ex);
+			LOGGER.error("[GeolocationWs - updateGeoProfile] - Error: {}",ex);
 			return Response.serverError().status(Status.NOT_FOUND).build();
 			
 		}catch (Exception ex) {
-			LOGGER.error("[GeolocationWs - updateGeoProfile] - Error: "+ex);
-			return Response.serverError().status(ERROR_NOT_PROCESS).build();
+			LOGGER.error("[GeolocationWs - updateGeoProfile] - Error: {}",ex);
+			return Response.serverError().status(Status.INTERNAL_SERVER_ERROR).build();
 			
 		}finally{
 			LOGGER.info("[GeolocationWs - updateGeoProfile] - Finish Timing:"+(System.currentTimeMillis()-currentSystemTime));

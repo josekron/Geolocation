@@ -50,6 +50,17 @@ public class GeoProfileDAO extends BasicDAO<GeoProfileVo, ObjectId>{
 	}
 	
 	/**
+	 * Find by id.
+	 *
+	 * @param id the id
+	 * @return the geo profile vo
+	 */
+	public List<GeoProfileVo> findByCoordinates (Double latitude, Double longitude, Double radius){
+		LOGGER.info("[GeoProfileDAO - findByCoordinates] - init");
+		return getDs().createQuery(GeoProfileVo.class).field("coordinates").near(latitude, longitude,  radius/111.12, true).asList();
+	}
+	
+	/**
 	 * Find All.
 	 * @return the geo profile vo List
 	 */
@@ -133,8 +144,8 @@ public class GeoProfileDAO extends BasicDAO<GeoProfileVo, ObjectId>{
 		
 		if(copyIfNull || source.getEmail()!=null)
 			ops.set("email", source.getEmail());
-		if(copyIfNull || source.getLocation()!=null)
-			ops.set("location", source.getLocation());
+		if(copyIfNull || source.getCoordinates()!=null)
+			ops.set("coordinates", source.getCoordinates());
 		if(copyIfNull || source.getDateCreation()!=null)
 			ops.set("dateCreation",source.getDateCreation());
 		if(copyIfNull || source.getDateModification()!=null)
